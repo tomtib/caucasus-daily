@@ -96,7 +96,8 @@ def get_article_photo():
     gis.search(search_params=params, path_to_dir="~/tmp", custom_image_name=TMP_IMAGE_NAME)
     return
 
-def create_post(ai_response, headline, photo):
+def create_post(ai_response, headline):
+    
     return
 
 def send_post():
@@ -123,9 +124,9 @@ if __name__=="__main__":
             prompt = get_ai_prompt(article_body, article_headline)
             ai_response = get_ai_response(prompt)
             headline = get_user_headline()
-            photo = get_article_photo()
+            get_article_photo()
 
-            post = create_post(ai_response, headline, photo)
+            post = create_post(ai_response, headline)
             send_post()
             publish_post()
             clean_up()
