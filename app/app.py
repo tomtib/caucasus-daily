@@ -9,8 +9,8 @@ def index():
     posts_dir = os.path.join("templates", "posts")
     # Get all files sorted by modification time
     files = sorted(os.listdir(posts_dir), key=lambda x: os.path.getmtime(os.path.join(posts_dir, x)), reverse=True)
-    latest_files = files[:3]  # Get the latest three files
-    return render_template("index.html", latest_files=latest_files)
+    raw_files = [file.split('.', 1)[0] for file in files]
+    return render_template("index.html", latest_files=raw_files)
 
 @app.route('/posts/<filename>')
 def get_post(filename):
