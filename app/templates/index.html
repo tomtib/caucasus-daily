@@ -128,14 +128,27 @@
                         <!-- Trending Top -->
                         <div class="slider-active">
                             <!-- Single -->
-                            <div class="single-slider">
+                            <div class="single-slider" >
                                 <div class="trending-top mb-30">
                                     <div class="trend-top-img">
-                                        <img src="{{ url_for('static', filename='assets/img/posts/' + latest_files[0] + '.jpg') }}" alt="">
+                                        <img src="{{ url_for('static', filename='assets/img/posts/' + latest_files[0]['filename'] + '.jpg') }}" alt="">
                                         <div class="trend-top-cap">
-                                            <span class="bgr" data-animation="fadeInUp" data-delay=".2s" data-duration="1000ms">Business</span>
-                                            <h2><a href="{{ url_for('get_post', filename=latest_files[0] + '.html') }}" data-animation="fadeInUp" data-delay=".4s" data-duration="1000ms">{{ latest_files[0] }}</a></h2>
-                                            <p data-animation="fadeInUp" data-delay=".6s" data-duration="1000ms">by Alice cloe   -   Jun 19, 2020</p>
+                                            <span class="bgr" data-animation="fadeInUp" data-delay=".2s" data-duration="1000ms">{{ latest_files[0]['tag'] }}</span>
+                                            <h2><a href="{{ url_for('get_post', filename=latest_files[0]['filename'] + '.html') }}" data-animation="fadeInUp" data-delay=".4s" data-duration="1000ms">{{ latest_files[0]['headline'] }}</a></h2>
+                                            <p data-animation="fadeInUp" data-delay=".6s" data-duration="1000ms">{{ latest_files[0]['date'] }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Single -->
+                            <div class="single-slider" style="height:100%;width:auto">
+                                <div class="trending-top mb-30">
+                                    <div class="trend-top-img">
+                                        <img src="{{ url_for('static', filename='assets/img/posts/' + latest_files[1]['filename'] + '.jpg') }}" alt="">
+                                        <div class="trend-top-cap">
+                                            <span class="bgr" data-animation="fadeInUp" data-delay=".2s" data-duration="1000ms">{{ latest_files[1]['tag'] }}</span>
+                                            <h2><a href="{{ url_for('get_post', filename=latest_files[1]['filename'] + '.html') }}" data-animation="fadeInUp" data-delay=".4s" data-duration="1000ms">{{ latest_files[1]['headline'] }}</a></h2>
+                                            <p data-animation="fadeInUp" data-delay=".6s" data-duration="1000ms">{{ latest_files[1]['date'] }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -144,24 +157,11 @@
                             <div class="single-slider">
                                 <div class="trending-top mb-30">
                                     <div class="trend-top-img">
-                                        <img src="{{ url_for('static', filename='assets/img/posts/' + latest_files[1] + '.jpg') }}" alt="">
+                                        <img src="{{ url_for('static', filename='assets/img/posts/' + latest_files[2]['filename'] + '.jpg') }}" alt="">
                                         <div class="trend-top-cap">
-                                            <span class="bgr" data-animation="fadeInUp" data-delay=".2s" data-duration="1000ms">Business</span>
-                                            <h2><a href="{{ url_for('get_post', filename=latest_files[1] + '.html') }}" data-animation="fadeInUp" data-delay=".4s" data-duration="1000ms">{{ latest_files[1] }}</a></h2>
-                                            <p data-animation="fadeInUp" data-delay=".6s" data-duration="1000ms">by Alice cloe   -   Jun 19, 2020</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Single -->
-                            <div class="single-slider">
-                                <div class="trending-top mb-30">
-                                    <div class="trend-top-img">
-                                        <img src="{{ url_for('static', filename='assets/img/posts/' + latest_files[2] + '.jpg') }}" alt="">
-                                        <div class="trend-top-cap">
-                                            <span class="bgr" data-animation="fadeInUp" data-delay=".2s" data-duration="1000ms">Business</span>
-                                            <h2><a href="{{ url_for('get_post', filename=latest_files[2] + '.html') }}" data-animation="fadeInUp" data-delay=".4s" data-duration="1000ms">{{ latest_files[2] }}</a></h2>
-                                            <p data-animation="fadeInUp" data-delay=".6s" data-duration="1000ms">by Alice cloe   -   Jun 19, 2020</p>
+                                            <span class="bgr" data-animation="fadeInUp" data-delay=".2s" data-duration="1000ms">{{ latest_files[2]['tag'] }}</span>
+                                            <h2><a href="{{ url_for('get_post', filename=latest_files[2]['filename'] + '.html') }}" data-animation="fadeInUp" data-delay=".4s" data-duration="1000ms">{{ latest_files[2]['headline'] }}</a></h2>
+                                            <p data-animation="fadeInUp" data-delay=".6s" data-duration="1000ms">{{ latest_files[2]['date'] }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -175,12 +175,11 @@
                             <div class="col-lg-12 col-md-6 col-sm-6">
                                 <div class="trending-top mb-30">
                                     <div class="trend-top-img">
-                                        <img src="{{ url_for('static', filename='assets/img/trending/trending_top3.jpg') }}" alt="">
+                                        <img src="{{ url_for('static', filename='assets/img/posts/' + latest_files[3]['filename'] + '.jpg') }}" alt="">
                                         <div class="trend-top-cap trend-top-cap2">
-                                            <span class="bgb">FASHION</span>
-                                            <h2><a href="latest_news.html">Secretart for Economic Air
-                                                plane that looks like</a></h2>
-                                            <p>by Alice cloe   -   Jun 19, 2020</p>
+                                            <span class="bgb">{{ latest_files[3]['tag'] }}</span>
+                                            <h2><a href="latest_news.html">{{ latest_files[3]['headline'] }}</a></h2>
+                                            <p>{{ latest_files[3]['date'] }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -188,11 +187,11 @@
                             <div class="col-lg-12 col-md-6 col-sm-6">
                                 <div class="trending-top mb-30">
                                     <div class="trend-top-img">
-                                        <img src="{{ url_for('static', filename='assets/img/trending/trending_top4.jpg') }}" alt="">
+                                        <img src="{{ url_for('static', filename='assets/img/posts/' + latest_files[4]['filename'] + '.jpg') }}" alt="">
                                         <div class="trend-top-cap trend-top-cap2">
-                                            <span class="bgg">TECH </span>
-                                            <h2><a href="latest_news.html">Secretart for Economic Air plane that looks like</a></h2>
-                                            <p>by Alice cloe   -   Jun 19, 2020</p>
+                                            <span class="bgg">{{ latest_files[3]['tag'] }}</span>
+                                            <h2><a href="latest_news.html">{{ latest_files[4]['headline'] }}</a></h2>
+                                            <p>{{ latest_files[4]['date'] }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -217,179 +216,47 @@
                                     <div class="weekly3-news-active dot-style d-flex">
                                         <div class="weekly3-single">
                                             <div class="weekly3-img">
-                                                <img src="{{ url_for('static', filename='assets/img/gallery/weekly2News1.png') }}" alt="">
+                                                <img src="{{ url_for('static', filename='assets/img/posts/' + latest_files[5]['filename'] + '.jpg') }}" alt="">
                                             </div>
                                             <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">What to Expect From the 2020 Oscar Nomin ations</a></h4>
-                                                <p>19 Jan 2020</p>
+                                                <h4><a href="latest_news.html">{{ latest_files[5]['headline'] }}</a></h4>
+                                                <p>{{ latest_files[5]['date'] }}</p>
                                             </div>
                                         </div> 
                                         <div class="weekly3-single">
                                             <div class="weekly3-img">
-                                                <img src="{{ url_for('static', filename='assets/img/gallery/weekly2News2.png') }}" alt="">
+                                                <img src="{{ url_for('static', filename='assets/img/posts/' + latest_files[6]['filename'] + '.jpg') }}" alt="">
                                             </div>
                                             <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">What to Expect From the 2020 Oscar Nomin ations</a></h4>
-                                                <p>19 Jan 2020</p>
+                                                <h4><a href="latest_news.html">{{ latest_files[6]['headline'] }}</a></h4>
+                                                <p>{{ latest_files[6]['date'] }}</p>
                                             </div>
                                         </div> 
                                         <div class="weekly3-single">
                                             <div class="weekly3-img">
-                                                <img src="{{ url_for('static', filename='assets/img/gallery/weekly2News3.png') }}" alt="">
+                                                <img src="{{ url_for('static', filename='assets/img/posts/' + latest_files[7]['filename'] + '.jpg') }}" alt="">
                                             </div>
                                             <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">What to Expect From the 2020 Oscar Nomin ations</a></h4>
-                                                <p>19 Jan 2020</p>
+                                                <h4><a href="latest_news.html">{{ latest_files[7]['headline'] }}</a></h4>
+                                                <p>{{ latest_files[7]['date'] }}</p>
                                             </div>
                                         </div>
                                         <div class="weekly3-single">
                                             <div class="weekly3-img">
-                                                <img src="{{ url_for('static', filename='assets/img/gallery/weekly2News4.png') }}" alt="">
+                                                <img src="{{ url_for('static', filename='assets/img/posts/' + latest_files[8]['filename'] + '.jpg') }}" alt="">
                                             </div>
                                             <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">What to Expect From the 2020 Oscar Nomin ations</a></h4>
-                                                <p>19 Jan 2020</p>
+                                                <h4><a href="latest_news.html">{{ latest_files[8]['headline'] }}</a></h4>
+                                                <p>{{ latest_files[8]['date'] }}</p>
                                             </div>
                                         </div> 
                                         <div class="weekly3-single">
                                             <div class="weekly3-img">
-                                                <img src="{{ url_for('static', filename='assets/img/gallery/weekly2News2.png') }}" alt="">
+                                                <img src="{{ url_for('static', filename='assets/img/posts/' + latest_files[9]['filename'] + '.jpg') }}" alt="">
                                             </div>
                                             <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">What to Expect From the 2020 Oscar Nomin ations</a></h4>
-                                                <p>19 Jan 2020</p>
-                                            </div>
-                                        </div> 
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>           
-    <!-- End Weekly-News -->
-    <!--   Weekly3-News start -->
-    <div class="weekly3-news-area pt-80 pb-130">
-        <div class="container">
-            <div class="weekly3-wrapper">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="slider-wrapper">
-                            <!-- Slider -->
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="weekly3-news-active dot-style d-flex">
-                                        <div class="weekly3-single">
-                                            <div class="weekly3-img">
-                                                <img src="{{ url_for('static', filename='assets/img/gallery/weekly2News1.png') }}" alt="">
-                                            </div>
-                                            <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">What to Expect From the 2020 Oscar Nomin ations</a></h4>
-                                                <p>19 Jan 2020</p>
-                                            </div>
-                                        </div> 
-                                        <div class="weekly3-single">
-                                            <div class="weekly3-img">
-                                                <img src="{{ url_for('static', filename='assets/img/gallery/weekly2News2.png') }}" alt="">
-                                            </div>
-                                            <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">What to Expect From the 2020 Oscar Nomin ations</a></h4>
-                                                <p>19 Jan 2020</p>
-                                            </div>
-                                        </div> 
-                                        <div class="weekly3-single">
-                                            <div class="weekly3-img">
-                                                <img src="{{ url_for('static', filename='assets/img/gallery/weekly2News3.png') }}" alt="">
-                                            </div>
-                                            <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">What to Expect From the 2020 Oscar Nomin ations</a></h4>
-                                                <p>19 Jan 2020</p>
-                                            </div>
-                                        </div>
-                                        <div class="weekly3-single">
-                                            <div class="weekly3-img">
-                                                <img src="{{ url_for('static', filename='assets/img/gallery/weekly2News4.png') }}" alt="">
-                                            </div>
-                                            <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">What to Expect From the 2020 Oscar Nomin ations</a></h4>
-                                                <p>19 Jan 2020</p>
-                                            </div>
-                                        </div> 
-                                        <div class="weekly3-single">
-                                            <div class="weekly3-img">
-                                                <img src="{{ url_for('static', filename='assets/img/gallery/weekly2News2.png') }}" alt="">
-                                            </div>
-                                            <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">What to Expect From the 2020 Oscar Nomin ations</a></h4>
-                                                <p>19 Jan 2020</p>
-                                            </div>
-                                        </div> 
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>           
-    <!-- End Weekly-News -->
-    <!--   Weekly3-News start -->
-    <div class="weekly3-news-area pt-80 pb-130">
-        <div class="container">
-            <div class="weekly3-wrapper">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="slider-wrapper">
-                            <!-- Slider -->
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="weekly3-news-active dot-style d-flex">
-                                        <div class="weekly3-single">
-                                            <div class="weekly3-img">
-                                                <img src="{{ url_for('static', filename='assets/img/gallery/weekly2News1.png') }}" alt="">
-                                            </div>
-                                            <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">What to Expect From the 2020 Oscar Nomin ations</a></h4>
-                                                <p>19 Jan 2020</p>
-                                            </div>
-                                        </div> 
-                                        <div class="weekly3-single">
-                                            <div class="weekly3-img">
-                                                <img src="{{ url_for('static', filename='assets/img/gallery/weekly2News2.png') }}" alt="">
-                                            </div>
-                                            <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">What to Expect From the 2020 Oscar Nomin ations</a></h4>
-                                                <p>19 Jan 2020</p>
-                                            </div>
-                                        </div> 
-                                        <div class="weekly3-single">
-                                            <div class="weekly3-img">
-                                                <img src="{{ url_for('static', filename='assets/img/gallery/weekly2News3.png') }}" alt="">
-                                            </div>
-                                            <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">What to Expect From the 2020 Oscar Nomin ations</a></h4>
-                                                <p>19 Jan 2020</p>
-                                            </div>
-                                        </div>
-                                        <div class="weekly3-single">
-                                            <div class="weekly3-img">
-                                                <img src="{{ url_for('static', filename='assets/img/gallery/weekly2News4.png') }}" alt="">
-                                            </div>
-                                            <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">What to Expect From the 2020 Oscar Nomin ations</a></h4>
-                                                <p>19 Jan 2020</p>
-                                            </div>
-                                        </div> 
-                                        <div class="weekly3-single">
-                                            <div class="weekly3-img">
-                                                <img src="{{ url_for('static', filename='assets/img/gallery/weekly2News2.png') }}" alt="">
-                                            </div>
-                                            <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">What to Expect From the 2020 Oscar Nomin ations</a></h4>
-                                                <p>19 Jan 2020</p>
+                                                <h4><a href="latest_news.html">{{ latest_files[9]['headline'] }}</a></h4>
+                                                <p>{{ latest_files[9]['date'] }}</p>
                                             </div>
                                         </div> 
                                     </div>
@@ -403,79 +270,7 @@
     </div>           
     <!-- End Weekly-News -->
 </main>
-<footer>
-    <!-- Footer Start-->
-    <div class="footer-main footer-bg">
-        <div class="footer-area footer-padding">
-            <div class="container">
-                <div class="row d-flex justify-content-between">
-                    <div class="col-xl-3 col-lg-3 col-md-5 col-sm-8">
-                        <div class="single-footer-caption mb-50">
-                            <div class="single-footer-caption mb-30">
-                                <!-- logo -->
-                                <div class="footer-logo">
-                                    <a href="index.html"><img src="{{ url_for('static', filename='assets/img/logo/logo2_footer.png') }}" alt=""></a>
-                                </div>
-                                <div class="footer-tittle">
-                                    <div class="footer-pera">
-                                        <p class="info1">Lorem ipsum dolor sit amet, nsectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.</p>
-                                        <p class="info2">198 West 21th Street, Suite 721 New York,NY 10010</p>
-                                        <p class="info2">Phone: +95 (0) 123 456 789 Cell: +95 (0) 123 456 789</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-4 col-lg-4 col-md-5 col-sm-7">
-                        <div class="single-footer-caption mb-50">
-                            <div class="footer-tittle">
-                                <h4>Popular post</h4>
-                            </div>
-                            <!-- Popular post -->
-                            <div class="whats-right-single mb-20">
-                                <div class="whats-right-img">
-                                    <img src="{{ url_for('static', filename='assets/img/gallery/footer_post1.png') }}" alt="">
-                                </div>
-                                <div class="whats-right-cap">
-                                    <h4><a href="latest_news.html">Scarlett’s disappointment at latest accolade</a></h4>
-                                    <p>Jhon  |  2 hours ago</p> 
-                                </div>
-                            </div>
-                            <!-- Popular post -->
-                            <div class="whats-right-single mb-20">
-                                <div class="whats-right-img">
-                                    <img src="{{ url_for('static', filename='assets/img/gallery/footer_post2.png') }}" alt="">
-                                </div>
-                                <div class="whats-right-cap">
-                                    <h4><a href="latest_news.html">Scarlett’s disappointment at latest accolade</a></h4>
-                                    <p>Jhon  |  2 hours ago</p> 
-                                </div>
-                            </div>
-                            <!-- Popular post -->
-                            <div class="whats-right-single mb-20">
-                                <div class="whats-right-img">
-                                    <img src="{{ url_for('static', filename='assets/img/gallery/footer_post3.png') }}" alt="">
-                                </div>
-                                <div class="whats-right-cap">
-                                    <h4><a href="latest_news.html">Scarlett’s disappointment at latest accolade</a></h4>
-                                    <p>Jhon  |  2 hours ago</p> 
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-lg-3 col-md-5 col-sm-7">
-                        <div class="single-footer-caption mb-50">
-                            <div class="banner">
-                                <img src="{{ url_for('static', filename='assets/img/gallery/body_card4.png') }}" alt="">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Footer End-->
-</footer>
+
 <!-- Search model Begin -->
 <div class="search-model-box">
     <div class="d-flex align-items-center h-100 justify-content-center">
