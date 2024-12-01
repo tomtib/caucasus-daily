@@ -8,13 +8,24 @@ from PIL import Image
 import string
 import random
 import glob
+import paramiko
+import posixpath
+import argparse
 
 OPENAI_API_KEY = os.environ['OPENAI_API_KEY']
 OPENAI_PROJECT_ID = os.environ['OPENAI_PROJECT_ID']
 GCS_DEVELOPER_KEY = os.environ['GCS_DEVELOPER_KEY']
 GCS_CX = os.environ['GCS_CX']
-TMP_IMAGE_NAME = "article_image.tmp"
+SSH_USER = os.environ['VULTR_SSH_USER']
+
+# Git bash on windows machine specific
+GIT_USER = 'Allyt'
+SSH_KEY = f"/Users/{GIT_USER}/.ssh/id_rsa"
+
+SSH_IP = os.environ['VULTR_IP']
 HTML_TEMPLATE = "post_template.html"
+HTML_TARGET = "/var/www/caucasusdaily/templates/posts/"
+JPG_TARGET = "/var/www/caucasusdaily/static/assets/img/posts/"
 
 WEBSITES = [
     { 
@@ -23,6 +34,19 @@ WEBSITES = [
         "scraper": "one"
     }
 ]
+
+def get_cmd_line_args():
+    parser = argparse.ArgumentParser(description="Manage the website.")
+    
+    # Add arguments
+    parser.add_argument(
+        "--update-website",
+        action="store_true",  # If provided, sets this argument to True
+        help="Update the website files on the server"
+    )
+    
+    # Parse arguments
+    return parser.parse_args()
 
 
 def get_news(website, article_no):
@@ -42,8 +66,8 @@ def scraper_one(html, website, article_no):
 
 
     article = html.find_all("article")[article_no]
-    yesterdays_date = date.today() # - timedelta(1)
-    if article.find_all(string=yesterdays_date.strftime(f" %B %d, %Y")):
+    yesterdays_date = date.today()  #- timedelta(1)
+    if article.find_all(string=yesterdays_date.strftime(f" %B %#d, %Y")):
         url = article.find("a")['href']
         html = get_soup(url)
         body = html.find(attrs={"class": "entry-content no-share"}).text
@@ -172,9 +196,74 @@ def create_post(ai_response, headline, tag, random_file_name):
     finished_post.close()
     return
 
+def connect_to_server():
+    client = paramiko.client.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    client.connect(SSH_IP, username=SSH_USER, key_filename=SSH_KEY)
+    sftp = client.open_sftp()
+    return client, sftp
+
+def disconnect_from_server(client, sftp):
+    sftp.close()
+    client.close()
+
 def publish_post():
+    client, sftp = connect_to_server()
+    html_file = find_latest_file("/tmp", "html")
+    jpg_file = find_latest_file("/tmp", "jpg")
     
+    if not html_file:
+        print("No .html file found in /tmp.")
+        return
+    if not jpg_file:
+        print("No .jpg file found in /tmp.")
+        return
+    
+    print(f"Found HTML file: {html_file}")
+    print(f"Found JPG file: {jpg_file}") 
+
+    try:  
+        # Upload the HTML file
+        print(f"Uploading {html_file} to {HTML_TARGET}")
+        sftp.put(html_file, os.path.join(HTML_TARGET, os.path.basename(html_file)))
+        
+        # Upload the JPG file
+        print(f"Uploading {jpg_file} to {JPG_TARGET}")
+        sftp.put(jpg_file, os.path.join(JPG_TARGET, os.path.basename(jpg_file)))
+        
+        print("Files uploaded successfully.")
+    except Exception as e:
+        print(f"An error occurred: {e}") 
+    disconnect_from_server(client, sftp)
     return
+
+def find_latest_file(directory, extension):
+    """Find the latest file with the given extension in the specified directory."""
+    search_pattern = os.path.join(directory, f"*.{extension}")
+    files = glob.glob(search_pattern)
+    if not files:
+        return None
+    # Sort files by modification time, descending
+    latest_file = max(files, key=os.path.getmtime)
+    return latest_file
+
+def update_website(local_path, remote_path, sftp):
+    client, sftp = connect_to_server()
+    for root, dirs, files in os.walk(local_path):
+        # Create the directories on the remote server if they don't exist
+        relative_path = os.path.relpath(root, local_path)
+        remote_dir = posixpath.join(remote_path, relative_path.replace("\\", "/"))
+        try:
+            sftp.mkdir(remote_dir)
+        except IOError:  # Directory might already exist
+            pass
+
+        # Upload all files in the directory
+        for file in files:
+            local_file = os.path.join(root, file)
+            remote_file = posixpath.join(remote_dir, file.replace("\\", "/"))
+            sftp.put(local_file, remote_file)
+    disconnect_from_server(client, sftp)
 
 def clean_up(random_file_name):
     files = glob.glob('tmp/*')
@@ -185,6 +274,10 @@ def clean_up(random_file_name):
 if __name__=="__main__":
     print("Starting...")
 
+    args = get_cmd_line_args()
+    if args.update_website:
+        update_website()
+
     for website in WEBSITES:
         print(f"Scraping {website['name']}...")
         article_no = 0
@@ -194,13 +287,13 @@ if __name__=="__main__":
                 print(f"Article {article_no + 1} not found")
                 break
             
-            random_file_name = ''.join(random.choices(string.ascii_uppercase + string.digits, k=16))
-            prompt = get_ai_prompt(article_body, article_headline)
-            ai_response = get_ai_response(prompt)
-            headline = get_user_headline()
-            get_article_photo(random_file_name)
-            tag = get_tag()
+            #random_file_name = ''.join(random.choices(string.ascii_uppercase + string.digits, k=16))
+            #prompt = get_ai_prompt(article_body, article_headline)
+            #ai_response = get_ai_response(prompt)
+            #headline = get_user_headline()
+            #get_article_photo(random_file_name)
+            #tag = get_tag()
             
-            create_post(ai_response, headline, tag, random_file_name)
+            #create_post(ai_response, headline, tag, random_file_name)
             publish_post()
-            clean_up(random_file_name)
+            #clean_up(random_file_name)
