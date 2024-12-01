@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from datetime import timedelta, date
+from datetime import date
 from openai import OpenAI
 import os
 from google_images_search import GoogleImagesSearch
@@ -11,6 +11,7 @@ import glob
 import paramiko
 import posixpath
 import argparse
+import re 
 
 OPENAI_API_KEY = os.environ['OPENAI_API_KEY']
 OPENAI_PROJECT_ID = os.environ['OPENAI_PROJECT_ID']
@@ -26,6 +27,8 @@ SSH_IP = os.environ['VULTR_IP']
 HTML_TEMPLATE = "post_template.html"
 HTML_TARGET = "/var/www/caucasusdaily/templates/posts/"
 JPG_TARGET = "/var/www/caucasusdaily/static/assets/img/posts/"
+LOCAL_PATH = "app/"
+REMOTE_PATH = "/var/www/caucasusdaily/"
 
 WEBSITES = [
     { 
@@ -83,9 +86,11 @@ def get_ai_prompt(article_body, article_headline):
     conclude_string = "If the article is still under 150 words, please write another few sentences that add any left out information and conclude the article. Please provide the re-write in a default format with spaces between sentences. The article says - "
     
     print("\n" + article_headline.upper() + "\n")
-    print(article_body)
+    print("\n" + article_body + "\n")
 
     important_points_input = input("Important points (bulleted list):")
+    if not important_points_input:
+        return False
     prompt = important_points_string + important_points_input + "\n" + conclude_string + article_body
 
     return prompt
@@ -106,19 +111,20 @@ def get_ai_response(prompt):
         ]
     )
     response_body = response.choices[0].message.content
-    print(response_body)
+    formatted_body = re.sub(r"(\.)", r"\1<br>", re.sub(r'[^\x00-\x7F]', "'", response_body))
+    print("\n" + formatted_body + "\n")
 
-    return 
+    return formatted_body
 
 def get_user_headline():
 
     headline = input("Type in headline: ")
     return headline
 
-def get_article_photo(random_file_name):
+def get_article_photo(random_file_name, headline):
     gis = GoogleImagesSearch(GCS_DEVELOPER_KEY, GCS_CX)
     params = {
-        'q': '...',
+        'q': headline,
         'num': 1,
         'rights': 'cc_publicdomain|cc_attribute|cc_sharealike|cc_noncommercial|cc_nonderived',
         'fileType': 'jpg',
@@ -130,8 +136,8 @@ def get_article_photo(random_file_name):
     image = Image.open('tmp/' + random_file_name + '.jpg')
     cropped_image = crop_image(image)
     rgb_image = cropped_image.convert('RGB')
-    rgb_image.save('tmp/' + random_file_name + '.jpg')
-
+    rgb_image.save('tmp/' + random_file_name + '.jpg', format="JPEG")
+    os.rename('tmp/' + random_file_name + '.JPG', 'tmp/' + random_file_name + '.jpg')
     return
 
 def crop_image(image):
@@ -189,7 +195,7 @@ def create_post(ai_response, headline, tag, random_file_name):
 
     with open(HTML_TEMPLATE, 'r') as file:
         html_template = file.read()
-        filled_template = html_template.replace('{{date}}', todays_date_formatted).replace('{{tag}}', tag). replace('{{headline}}', headline).replace('{{body}}', ai_response)
+        filled_template = html_template.replace('{{date}}', todays_date_formatted).replace('{{tag}}', tag). replace('{{headline}}', headline).replace('{{body}}', ai_response).replace('{{image}}', random_file_name)
 
     finished_post = open('tmp/' + random_file_name + '.html', "x")
     finished_post.write(filled_template)
@@ -209,14 +215,14 @@ def disconnect_from_server(client, sftp):
 
 def publish_post():
     client, sftp = connect_to_server()
-    html_file = find_latest_file("/tmp", "html")
-    jpg_file = find_latest_file("/tmp", "jpg")
+    html_file = find_latest_file("tmp", "html")
+    jpg_file = find_latest_file("tmp", "jpg")
     
     if not html_file:
-        print("No .html file found in /tmp.")
+        print("No .html file found in tmp.")
         return
     if not jpg_file:
-        print("No .jpg file found in /tmp.")
+        print("No .jpg file found in tmp.")
         return
     
     print(f"Found HTML file: {html_file}")
@@ -247,12 +253,13 @@ def find_latest_file(directory, extension):
     latest_file = max(files, key=os.path.getmtime)
     return latest_file
 
-def update_website(local_path, remote_path, sftp):
+def update_website():
+    print("Updating website selected...")
     client, sftp = connect_to_server()
-    for root, dirs, files in os.walk(local_path):
+    for root, dirs, files in os.walk(LOCAL_PATH):
         # Create the directories on the remote server if they don't exist
-        relative_path = os.path.relpath(root, local_path)
-        remote_dir = posixpath.join(remote_path, relative_path.replace("\\", "/"))
+        relative_path = os.path.relpath(root, LOCAL_PATH)
+        remote_dir = posixpath.join(REMOTE_PATH, relative_path.replace("\\", "/"))
         try:
             sftp.mkdir(remote_dir)
         except IOError:  # Directory might already exist
@@ -264,8 +271,9 @@ def update_website(local_path, remote_path, sftp):
             remote_file = posixpath.join(remote_dir, file.replace("\\", "/"))
             sftp.put(local_file, remote_file)
     disconnect_from_server(client, sftp)
+    exit()
 
-def clean_up(random_file_name):
+def clean_up():
     files = glob.glob('tmp/*')
     for f in files:
         os.remove(f)
@@ -287,13 +295,15 @@ if __name__=="__main__":
                 print(f"Article {article_no + 1} not found")
                 break
             
-            #random_file_name = ''.join(random.choices(string.ascii_uppercase + string.digits, k=16))
-            #prompt = get_ai_prompt(article_body, article_headline)
-            #ai_response = get_ai_response(prompt)
-            #headline = get_user_headline()
-            #get_article_photo(random_file_name)
-            #tag = get_tag()
+            random_file_name = ''.join(random.choices(string.ascii_uppercase + string.digits, k=16))
+            prompt = get_ai_prompt(article_body, article_headline)
+            if not prompt:
+                continue
+            ai_response = get_ai_response(prompt)
+            headline = get_user_headline()
+            get_article_photo(random_file_name, headline)
+            tag = get_tag()
             
-            #create_post(ai_response, headline, tag, random_file_name)
+            create_post(ai_response, headline, tag, random_file_name)
             publish_post()
-            #clean_up(random_file_name)
+            clean_up()

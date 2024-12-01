@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="manifest" href="site.webmanifest">
     <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.ico">
+    <link rel="icon" href="{{ url_for('static', filename='assets/img/logo/logo_only.png') }}" type="image/png">
     
     <!-- CSS here -->
     <link rel="stylesheet" href="/static/assets/css/bootstrap.min.css">
@@ -125,7 +126,7 @@
                                     <span class="bgr" data-animation="fadeInUp" data-delay=".2s" data-duration="1000ms">{{tag}}</span>
                             </div>
                             <div class="about-img">
-                                <img src="/static/assets/img/posts/latest_news copy 2.jpg" alt="">
+                                <img src="/static/assets/img/posts/{{image}}.jpg" alt="">
                             </div>
 
                             <div class="about-prea">
