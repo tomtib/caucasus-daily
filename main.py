@@ -128,7 +128,7 @@ def get_article_photo(random_file_name, headline):
         'num': 1,
         'rights': 'cc_publicdomain|cc_attribute|cc_sharealike|cc_noncommercial|cc_nonderived',
         'fileType': 'jpg',
-        'imgSize': 'large'
+        'imgSize': 'imgSizeUndefined'
     }
 
     print("Downloading image...")

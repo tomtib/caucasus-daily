@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>News  HTML-5 Template </title>
+    <title>Caucasus Daily</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="manifest" href="site.webmanifest">
@@ -53,7 +53,7 @@
                             </div>
                             <div class="header-info-right">
                                 <ul class="header-date">
-                                    <li><span class="flaticon-calendar"></span> +880166 253 232</li>
+                                    <li><span class="flaticon-calendar"></span> <span id="live-date"></li>
                                 </ul>
                             </div>
                         </div>
@@ -88,8 +88,8 @@
                             <div class="main-menu d-none d-md-block">
                                 <nav>                  
                                     <ul id="navigation">
-                                        <li><a href="index.html">Home</a></li>
-                                        <li><a href="about.html">about</a></li>
+                                        <li><a href="{{ url_for('index') }}">Home</a></li>
+                                        <li><a href="{{ url_for('get_page', filename='politics.html') }}">Politics</a></li>
                                         </li>
                                     </ul>
                                 </nav>
@@ -178,7 +178,7 @@
                                         <img src="{{ url_for('static', filename='assets/img/posts/' + latest_files[3]['filename'] + '.jpg') }}" alt="">
                                         <div class="trend-top-cap trend-top-cap2">
                                             <span class="bgb">{{ latest_files[3]['tag'] }}</span>
-                                            <h2><a href="latest_news.html">{{ latest_files[3]['headline'] }}</a></h2>
+                                            <h2><a href="{{ url_for('get_post', filename=latest_files[3]['filename'] + '.html') }}">{{ latest_files[3]['headline'] }}</a></h2>
                                             <p>{{ latest_files[3]['date'] }}</p>
                                         </div>
                                     </div>
@@ -190,7 +190,7 @@
                                         <img src="{{ url_for('static', filename='assets/img/posts/' + latest_files[4]['filename'] + '.jpg') }}" alt="">
                                         <div class="trend-top-cap trend-top-cap2">
                                             <span class="bgg">{{ latest_files[3]['tag'] }}</span>
-                                            <h2><a href="latest_news.html">{{ latest_files[4]['headline'] }}</a></h2>
+                                            <h2><a href="{{ url_for('get_post', filename=latest_files[4]['filename'] + '.html') }}">{{ latest_files[4]['headline'] }}</a></h2>
                                             <p>{{ latest_files[4]['date'] }}</p>
                                         </div>
                                     </div>
@@ -219,7 +219,7 @@
                                                 <img src="{{ url_for('static', filename='assets/img/posts/' + latest_files[5]['filename'] + '.jpg') }}" alt="">
                                             </div>
                                             <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">{{ latest_files[5]['headline'] }}</a></h4>
+                                                <h4><a href="{{ url_for('get_post', filename=latest_files[5]['filename'] + '.html') }}">{{ latest_files[5]['headline'] }}</a></h4>
                                                 <p>{{ latest_files[5]['date'] }}</p>
                                             </div>
                                         </div> 
@@ -228,7 +228,7 @@
                                                 <img src="{{ url_for('static', filename='assets/img/posts/' + latest_files[6]['filename'] + '.jpg') }}" alt="">
                                             </div>
                                             <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">{{ latest_files[6]['headline'] }}</a></h4>
+                                                <h4><a href="{{ url_for('get_post', filename=latest_files[6]['filename'] + '.html') }}">{{ latest_files[6]['headline'] }}</a></h4>
                                                 <p>{{ latest_files[6]['date'] }}</p>
                                             </div>
                                         </div> 
@@ -237,7 +237,7 @@
                                                 <img src="{{ url_for('static', filename='assets/img/posts/' + latest_files[7]['filename'] + '.jpg') }}" alt="">
                                             </div>
                                             <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">{{ latest_files[7]['headline'] }}</a></h4>
+                                                <h4><a href="{{ url_for('get_post', filename=latest_files[7]['filename'] + '.html') }}">{{ latest_files[7]['headline'] }}</a></h4>
                                                 <p>{{ latest_files[7]['date'] }}</p>
                                             </div>
                                         </div>
@@ -246,7 +246,7 @@
                                                 <img src="{{ url_for('static', filename='assets/img/posts/' + latest_files[8]['filename'] + '.jpg') }}" alt="">
                                             </div>
                                             <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">{{ latest_files[8]['headline'] }}</a></h4>
+                                                <h4><a href="{{ url_for('get_post', filename=latest_files[8]['filename'] + '.html') }}">{{ latest_files[8]['headline'] }}</a></h4>
                                                 <p>{{ latest_files[8]['date'] }}</p>
                                             </div>
                                         </div> 
@@ -255,7 +255,7 @@
                                                 <img src="{{ url_for('static', filename='assets/img/posts/' + latest_files[9]['filename'] + '.jpg') }}" alt="">
                                             </div>
                                             <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">{{ latest_files[9]['headline'] }}</a></h4>
+                                                <h4><a href="{{ url_for('get_post', filename=latest_files[9]['filename'] + '.html') }}">{{ latest_files[9]['headline'] }}</a></h4>
                                                 <p>{{ latest_files[9]['date'] }}</p>
                                             </div>
                                         </div> 
@@ -317,6 +317,8 @@
     <!-- Jquery Plugins, main Jquery -->	
     <script src="{{ url_for('static', filename='./assets/js/plugins.js') }}"></script>
     <script src="{{ url_for('static', filename='./assets/js/main.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='./assets/js/custom/liveDate.js') }}"></script>
     
 </body>
 </html>

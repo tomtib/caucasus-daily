@@ -12,6 +12,7 @@ def index():
     files = sorted(os.listdir(posts_dir), key=lambda x: os.path.getmtime(os.path.join(posts_dir, x)), reverse=True)
     
     data = []
+    latest_politics_posts = []
 
     for filename in files:
         # Skip non-HTML files (if any)
@@ -33,21 +34,33 @@ def index():
 
         raw_file = filename.split('.', 1)[0]
 
-        data.append({
+        post = {
             "filename": raw_file,
             "date": date,
             "body": body,
             "headline": headline,
             "tag": tag
-            })
-        
-    return render_template("index.html", latest_files=data)
+        }
+
+        data.append(post)
+
+        # Check if the tag is "Politics" and add to politics-specific list
+        if tag and tag.lower() == "politics":
+            latest_politics_posts.append(post)
+              
+    return render_template("index.html", latest_files=data,  latest_politics_posts=latest_politics_posts)
 
 @app.route('/posts/<filename>')
 def get_post(filename):
     # Dynamically serve files from the templates/posts/ directory
     posts_dir = os.path.join("templates", "posts")
     return send_from_directory(posts_dir, filename)
+
+@app.route('/pages/<filename>')
+def get_page(filename):
+    # Dynamically serve files from the templates/pages/ directory
+    pages_dir = os.path.join("templates", "pages")
+    return send_from_directory(pages_dir, filename)
 
 if __name__ == '__main__':
     app.run(debug=True)
