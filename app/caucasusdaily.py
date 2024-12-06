@@ -48,7 +48,8 @@ def index():
         if tag and tag.lower() == "politics":
             latest_politics_posts.append(post)
               
-    return render_template("index.html", latest_files=data,  latest_politics_posts=latest_politics_posts)
+    return render_template("index.html", latest_files=data)
+
 
 @app.route('/posts/<filename>')
 def get_post(filename):
@@ -61,6 +62,41 @@ def get_page(filename):
     # Dynamically serve files from the templates/pages/ directory
     pages_dir = os.path.join("templates", "pages")
     return send_from_directory(pages_dir, filename)
+
+@app.route('/politics')
+def politics():
+    # Serve the politics.html template and pass latest_politics_posts
+    posts_dir = os.path.join("templates", "posts")
+    files = sorted(os.listdir(posts_dir), key=lambda x: os.path.getmtime(os.path.join(posts_dir, x)), reverse=True)
+
+    latest_politics_posts = []
+    for filename in files:
+        if not filename.endswith(".html"):
+            continue
+        file_path = os.path.join(posts_dir, filename)
+
+        with open(file_path, "r", encoding="utf-8") as file:
+            html_content = file.read()
+
+        soup = BeautifulSoup(html_content, "html.parser")
+        tag = soup.find("span", class_="bgr").get_text(strip=True) if soup.find("span", class_="bgr") else None
+
+        # Check if the tag is "Politics" and add to politics-specific list
+        if tag and tag.lower() == "politics":
+            date = soup.find("div", class_="date").get_text(strip=True) if soup.find("div", class_="date") else None
+            headline = soup.find("h3").get_text(strip=True) if soup.find("h3") else None
+            body = soup.find("p", class_="about-pera1").get_text(strip=True) if soup.find("p", class_="about-pera1") else None
+
+            post = {
+                "filename": filename.split('.', 1)[0],
+                "date": date,
+                "body": body,
+                "headline": headline,
+                "tag": tag
+            }
+            latest_politics_posts.append(post)
+
+    return render_template("pages/politics.html", latest_politics_posts=latest_politics_posts)
 
 if __name__ == '__main__':
     app.run(debug=True)

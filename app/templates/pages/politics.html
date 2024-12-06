@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>CaucasusDaily</title>
+    <title>Caucasus Daily</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="manifest" href="site.webmanifest">
@@ -88,8 +88,8 @@
                             <div class="main-menu d-none d-md-block">
                                 <nav>                  
                                     <ul id="navigation">
-                                        <li><a href="index.html">Home</a></li>
-                                        <li><a href="about.html">about</a></li>
+                                        <li><a href="{{ url_for('index') }}">Home</a></li>
+                                        <li><a href="{{ url_for('politics') }}">Politics</a></li>
                                         </li>
                                     </ul>
                                 </nav>
@@ -135,44 +135,110 @@
                                                 <img src="{{ url_for('static', filename='assets/img/posts/' + latest_politics_posts[0]['filename'] + '.jpg') }}" alt="">
                                             </div>
                                             <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">{{ latest_politics_posts[5]['headline'] }}</a></h4>
-                                                <p>{{ latest_files[5]['date'] }}</p>
+                                                <h4><a href="{{ url_for('get_post', filename=latest_politics_posts[0]['filename'] + '.html') }}">{{ latest_politics_posts[0]['headline'] }}</a></h4>
+                                                <p>{{ latest_politics_posts[0]['date'] }}</p>
                                             </div>
                                         </div> 
                                         <div class="weekly3-single">
                                             <div class="weekly3-img">
-                                                <img src='/static/assets/img/posts/' + latest_files[6]['filename'] + '.jpg') }}" alt="">
+                                                <img src="{{ url_for('static', filename='assets/img/posts/' + latest_politics_posts[1]['filename'] + '.jpg') }}" alt="">
                                             </div>
                                             <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">{{ latest_files[6]['headline'] }}</a></h4>
-                                                <p>{{ latest_files[6]['date'] }}</p>
+                                                <h4><a href="{{ url_for('get_post', filename=latest_politics_posts[1]['filename'] + '.html') }}">{{ latest_politics_posts[1]['headline'] }}</a></h4>
+                                                <p>{{ latest_politics_posts[1]['date'] }}</p>
                                             </div>
                                         </div> 
                                         <div class="weekly3-single">
                                             <div class="weekly3-img">
-                                                <img src='/static/assets/img/posts/' + latest_files[7]['filename'] + '.jpg') }}" alt="">
+                                                <img src="{{ url_for('static', filename='assets/img/posts/' + latest_politics_posts[2]['filename'] + '.jpg') }}" alt="">
                                             </div>
                                             <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">{{ latest_files[7]['headline'] }}</a></h4>
-                                                <p>{{ latest_files[7]['date'] }}</p>
+                                                <h4><a href="{{ url_for('get_post', filename=latest_politics_posts[2]['filename'] + '.html') }}">{{ latest_politics_posts[2]['headline'] }}</a></h4>
+                                                <p>{{ latest_politics_posts[2]['date'] }}</p>
                                             </div>
                                         </div>
                                         <div class="weekly3-single">
                                             <div class="weekly3-img">
-                                                <img src='/static/assets/img/posts/' + latest_files[8]['filename'] + '.jpg') }}" alt="">
+                                                <img src="{{ url_for('static', filename='assets/img/posts/' + latest_politics_posts[3]['filename'] + '.jpg') }}" alt="">
                                             </div>
                                             <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">{{ latest_files[8]['headline'] }}</a></h4>
-                                                <p>{{ latest_files[8]['date'] }}</p>
+                                                <h4><a href="{{ url_for('get_post', filename=latest_politics_posts[3]['filename'] + '.html') }}">{{ latest_politics_posts[3]['headline'] }}</a></h4>
+                                                <p>{{ latest_politics_posts[3]['date'] }}</p>
                                             </div>
                                         </div> 
                                         <div class="weekly3-single">
                                             <div class="weekly3-img">
-                                                <img src='/static/assets/img/posts/' + latest_files[9]['filename'] + '.jpg') }}" alt="">
+                                                <img src="{{ url_for('static', filename='assets/img/posts/' + latest_politics_posts[4]['filename'] + '.jpg') }}" alt="">
                                             </div>
                                             <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">{{ latest_files[9]['headline'] }}</a></h4>
-                                                <p>{{ latest_files[9]['date'] }}</p>
+                                                <h4><a href="{{ url_for('get_post', filename=latest_politics_posts[4]['filename'] + '.html') }}">{{ latest_politics_posts[4]['headline'] }}</a></h4>
+                                                <p>{{ latest_politics_posts[4]['date'] }}</p>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>           
+    <!-- End Weekly-News -->
+    <!--   Weekly3-News start -->
+    <div class="weekly3-news-area pt-80 pb-130">
+        <div class="container">
+            <div class="weekly3-wrapper">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="slider-wrapper">
+                            <!-- Slider -->
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="weekly3-news-active dot-style d-flex">
+                                        <div class="weekly3-single">
+                                            <div class="weekly3-img">
+                                                <img src="{{ url_for('static', filename='assets/img/posts/' + latest_politics_posts[5]['filename'] + '.jpg') }}" alt="">
+                                            </div>
+                                            <div class="weekly3-caption">
+                                                <h4><a href="{{ url_for('get_post', filename=latest_politics_posts[5]['filename'] + '.html') }}">{{ latest_politics_posts[5]['headline'] }}</a></h4>
+                                                <p>{{ latest_politics_posts[5]['date'] }}</p>
+                                            </div>
+                                        </div> 
+                                        <div class="weekly3-single">
+                                            <div class="weekly3-img">
+                                                <img src="{{ url_for('static', filename='assets/img/posts/' + latest_politics_posts[6]['filename'] + '.jpg') }}" alt="">
+                                            </div>
+                                            <div class="weekly3-caption">
+                                                <h4><a href="{{ url_for('get_post', filename=latest_politics_posts[6]['filename'] + '.html') }}">{{ latest_politics_posts[6]['headline'] }}</a></h4>
+                                                <p>{{ latest_politics_posts[6]['date'] }}</p>
+                                            </div>
+                                        </div> 
+                                        <div class="weekly3-single">
+                                            <div class="weekly3-img">
+                                                <img src="{{ url_for('static', filename='assets/img/posts/' + latest_politics_posts[7]['filename'] + '.jpg') }}" alt="">
+                                            </div>
+                                            <div class="weekly3-caption">
+                                                <h4><a href="{{ url_for('get_post', filename=latest_politics_posts[7]['filename'] + '.html') }}">{{ latest_politics_posts[7]['headline'] }}</a></h4>
+                                                <p>{{ latest_politics_posts[7]['date'] }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="weekly3-single">
+                                            <div class="weekly3-img">
+                                                <img src="{{ url_for('static', filename='assets/img/posts/' + latest_politics_posts[8]['filename'] + '.jpg') }}" alt="">
+                                            </div>
+                                            <div class="weekly3-caption">
+                                                <h4><a href="{{ url_for('get_post', filename=latest_politics_posts[8]['filename'] + '.html') }}">{{ latest_politics_posts[8]['headline'] }}</a></h4>
+                                                <p>{{ latest_politics_posts[8]['date'] }}</p>
+                                            </div>
+                                        </div> 
+                                        <div class="weekly3-single">
+                                            <div class="weekly3-img">
+                                                <img src="{{ url_for('static', filename='assets/img/posts/' + latest_politics_posts[9]['filename'] + '.jpg') }}" alt="">
+                                            </div>
+                                            <div class="weekly3-caption">
+                                                <h4><a href="{{ url_for('get_post', filename=latest_politics_posts[9]['filename'] + '.html') }}">{{ latest_politics_posts[9]['headline'] }}</a></h4>
+                                                <p>{{ latest_politics_posts[9]['date'] }}</p>
                                             </div>
                                         </div> 
                                     </div>

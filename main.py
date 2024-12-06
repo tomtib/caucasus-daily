@@ -1,5 +1,7 @@
 import requests
+import cloudscraper # passes challenges on News.am
 from bs4 import BeautifulSoup
+
 from datetime import date
 from openai import OpenAI
 import os
@@ -12,6 +14,11 @@ import paramiko
 import posixpath
 import argparse
 import re 
+import time
+
+NEWS_DATE = date.today()
+NEWS_AM_URL_DATE = NEWS_DATE.strftime(f"%Y/%m/%#d")
+
 
 OPENAI_API_KEY = os.environ['OPENAI_API_KEY']
 OPENAI_PROJECT_ID = os.environ['OPENAI_PROJECT_ID']
@@ -32,10 +39,35 @@ REMOTE_PATH = "/var/www/caucasusdaily/"
 
 WEBSITES = [
     { 
-        "name": "GeorgiaToday",
+        "name": "GeorgiaToday Politics",
         "url" : "https://georgiatoday.ge/category/politics/",
         "scraper": "one"
-    }
+    },
+    { 
+        "name": "GeorgiaToday Business",
+        "url" : "https://georgiatoday.ge/category/business/",
+        "scraper": "one"
+    },
+    { 
+        "name": "Report.az Politics",
+        "url" : "https://report.az/en/politics/",
+        "scraper": "two"
+    },
+    { 
+        "name": "Report.az Economy",
+        "url" : "https://report.az/en/economy/",
+        "scraper": "two"
+    },     
+    { 
+        "name": "News.am Politics",
+        "url" : f"https://news.am/eng/news/armenia/politics/{NEWS_AM_URL_DATE}/",
+        "scraper": "three"
+    },
+    { 
+        "name": "News.am Politics",
+        "url" : f"https://news.am/eng/news/armenia/economics/{NEWS_AM_URL_DATE}/",
+        "scraper": "three"
+    },
 ]
 
 def get_cmd_line_args():
@@ -53,9 +85,12 @@ def get_cmd_line_args():
 
 
 def get_news(website, article_no):
-    html = get_soup(website["url"])
     if website["scraper"] == "one":
-        article_no, body, headline = scraper_one(html, website, article_no)
+        article_no, body, headline = scraper_one(website, article_no)
+    if website["scraper"] == "two":
+        article_no, body, headline = scraper_two(website, article_no)
+    if website["scraper"] == "three":
+        article_no, body, headline = scraper_three(website, article_no)
     return article_no, body, headline
 
 
@@ -64,22 +99,105 @@ def get_soup(url):
     return BeautifulSoup(response.text, 'html.parser')
 
 
-def scraper_one(html, website, article_no):
-    print(f'Scraping article {article_no + 1} from {website["url"]}')
+def get_secure_soup(url, proxy):
+    scraper = cloudscraper.create_scraper()
+    scraper.proxies = proxy
+    response = scraper.get(url)
+    return BeautifulSoup(response.text, 'html.parser')
 
+
+def scraper_one(website, article_no):
+    print(f'Scraping article {article_no + 1} from {website["url"]}')
+    html = get_soup(website["url"])
 
     article = html.find_all("article")[article_no]
-    yesterdays_date = date.today()  #- timedelta(1)
-    if article.find_all(string=yesterdays_date.strftime(f" %B %#d, %Y")):
+    if article.find_all(string=NEWS_DATE.strftime(f" %B %#d, %Y")):
         url = article.find("a")['href']
-        html = get_soup(url)
-        body = html.find(attrs={"class": "entry-content no-share"}).text
-        headline = html.find(attrs={"class": "jeg_post_title"}).text
+        article_html = get_soup(url)
+        body = article_html.find(attrs={"class": "entry-content no-share"}).text
+        headline = article_html.find(attrs={"class": "jeg_post_title"}).text
         article_no = article_no + 1
         return article_no, body, headline
     else:    
         return article_no, None, None
 
+def scraper_two(website, article_no):
+    print(f'Scraping article {article_no + 1} from {website["url"]}')
+    proxy = get_working_proxy()
+    html = get_secure_soup(website["url"], proxy)
+
+    article = html.find_all('div', class_='news-block')[article_no]
+    if article.find_all(string=NEWS_DATE.strftime(f"%B %#d, %Y")):
+        url = "https://report.az" + article.find("a")['href']
+        article_html = get_soup(url)
+        body = article_html.find(attrs={"class": "editor-body"}).text
+        headline = article_html.find(attrs={"class": "news-title"}).text
+        article_no = article_no + 1
+        return article_no, body, headline
+    else:    
+        return article_no, None, None
+
+
+def scraper_three(website, article_no):
+    print(f'Scraping article {article_no + 1} from {website["url"]}')
+    proxy = get_working_proxy()
+    html = get_secure_soup(website["url"], proxy)
+
+    article = html.find_all("article")[article_no]
+    if article:
+        url = "https://news.am/" + article.find("a")['href']
+        time.sleep(5)
+        print(url)
+        article_html = get_secure_soup(url)
+        print(article_html)
+        body = article_html.find(attrs={"class": "article-body", "itemprop": "articleBody"}).text
+        headline = article_html.find(attrs={"class": "article-title", "itemprop": "name"}).text
+        article_no = article_no + 1
+        return article_no, body, headline
+    else:    
+        return article_no, None, None
+
+
+def fetch_proxies(url):
+    """Fetches proxies from the provided proxy list URL."""
+    response = requests.get(url)
+    response.raise_for_status()  # Ensure request succeeded
+    soup = BeautifulSoup(response.text, 'html.parser')
+    proxy_table = soup.find('table', {'id': 'proxylisttable'})
+    proxies = []
+    
+    if proxy_table:
+        rows = proxy_table.find_all('tr')[1:]  # Skip the header row
+        for row in rows:
+            columns = row.find_all('td')
+            if columns:
+                ip = columns[0].text.strip()
+                port = columns[1].text.strip()
+                proxies.append(f"{ip}:{port}")
+    return proxies
+
+def test_proxy(proxy):
+    """Tests if the proxy works by making a simple request."""
+    try:
+        test_url = "https://httpbin.org/ip"
+        response = requests.get(test_url, proxies={"https": proxy}, timeout=5)
+        response.raise_for_status()
+        print(f"Working proxy: {proxy}, Response: {response.json()}")
+        return True
+    except Exception as e:
+        print(f"Failed proxy: {proxy}, Error: {e}")
+        return False
+
+def get_working_proxy():
+    """Finds the first working proxy from the list."""
+    proxy_url = "https://www.sslproxies.org/"
+    proxies = fetch_proxies(proxy_url)
+    
+    for proxy in proxies:
+        if test_proxy(proxy):
+            return {"https": proxy}
+    print("No working proxies found.")
+    return None
 
 def get_ai_prompt(article_body, article_headline):
     important_points_string = "Please re-write this article in under 150 words in order of the most important points, each point being a sentence with a higher density of information - "
@@ -88,7 +206,7 @@ def get_ai_prompt(article_body, article_headline):
     print("\n" + article_headline.upper() + "\n")
     print("\n" + article_body + "\n")
 
-    important_points_input = input("Important points (bulleted list):")
+    important_points_input = input("Important points (bulleted list): ")
     if not important_points_input:
         return False
     prompt = important_points_string + important_points_input + "\n" + conclude_string + article_body
@@ -123,8 +241,9 @@ def get_user_headline():
 
 def get_article_photo(random_file_name, headline):
     gis = GoogleImagesSearch(GCS_DEVELOPER_KEY, GCS_CX)
+    search_query = input("Search query for article image: ")
     params = {
-        'q': headline,
+        'q': search_query,
         'num': 1,
         'rights': 'cc_publicdomain|cc_attribute|cc_sharealike|cc_noncommercial|cc_nonderived',
         'fileType': 'jpg',
@@ -287,7 +406,9 @@ if __name__=="__main__":
         update_website()
 
     for website in WEBSITES:
-        print(f"Scraping {website['name']}...")
+        skip = input(f"Proceed scraping {website['name']} (y/n): ") # If "n" skip
+        if skip == "n":
+            continue
         article_no = 0
         while True:
             article_no, article_body, article_headline = get_news(website, article_no)
@@ -301,7 +422,7 @@ if __name__=="__main__":
                 continue
             ai_response = get_ai_response(prompt)
             headline = get_user_headline()
-            get_article_photo(random_file_name, headline)
+            get_article_photo(random_file_name)
             tag = get_tag()
             
             create_post(ai_response, headline, tag, random_file_name)
