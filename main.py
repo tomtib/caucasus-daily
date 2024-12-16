@@ -1,5 +1,5 @@
 import requests
-import cloudscraper # passes challenges on News.am
+from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
 
 from datetime import date
@@ -99,11 +99,14 @@ def get_soup(url):
     return BeautifulSoup(response.text, 'html.parser')
 
 
-def get_secure_soup(url, proxy):
-    scraper = cloudscraper.create_scraper()
-    scraper.proxies = proxy
-    response = scraper.get(url)
-    return BeautifulSoup(response.text, 'html.parser')
+def get_secure_soup(url):
+    with sync_playwright() as p:
+        browser = p.firefox.launch()
+        page = browser.new_page()
+        page.goto(url)
+        response = page.content()
+        browser.close()
+    return BeautifulSoup(response, 'html.parser')
 
 
 def scraper_one(website, article_no):
@@ -123,13 +126,13 @@ def scraper_one(website, article_no):
 
 def scraper_two(website, article_no):
     print(f'Scraping article {article_no + 1} from {website["url"]}')
-    proxy = get_working_proxy()
-    html = get_secure_soup(website["url"], proxy)
+    proxy =  False #get_working_proxy()
+    html = get_secure_soup(website["url"])
 
     article = html.find_all('div', class_='news-block')[article_no]
     if article.find_all(string=NEWS_DATE.strftime(f"%B %#d, %Y")):
         url = "https://report.az" + article.find("a")['href']
-        article_html = get_soup(url)
+        article_html = get_secure_soup(url)
         body = article_html.find(attrs={"class": "editor-body"}).text
         headline = article_html.find(attrs={"class": "news-title"}).text
         article_no = article_no + 1
@@ -140,13 +143,13 @@ def scraper_two(website, article_no):
 
 def scraper_three(website, article_no):
     print(f'Scraping article {article_no + 1} from {website["url"]}')
-    proxy = get_working_proxy()
-    html = get_secure_soup(website["url"], proxy)
+    proxy =  False #get_working_proxy()
+    html = get_secure_soup(website["url"])
 
     article = html.find_all("article")[article_no]
+
     if article:
         url = "https://news.am/" + article.find("a")['href']
-        time.sleep(5)
         print(url)
         article_html = get_secure_soup(url)
         print(article_html)
@@ -163,7 +166,7 @@ def fetch_proxies(url):
     response = requests.get(url)
     response.raise_for_status()  # Ensure request succeeded
     soup = BeautifulSoup(response.text, 'html.parser')
-    proxy_table = soup.find('table', {'id': 'proxylisttable'})
+    proxy_table = soup.find('table')
     proxies = []
     
     if proxy_table:
@@ -177,10 +180,16 @@ def fetch_proxies(url):
     return proxies
 
 def test_proxy(proxy):
+    headers = {
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36"
+    }
     """Tests if the proxy works by making a simple request."""
     try:
-        test_url = "https://httpbin.org/ip"
-        response = requests.get(test_url, proxies={"https": proxy}, timeout=5)
+        test_url = "https://news.am/eng/"
+        response = requests.get(test_url, proxies={"https": proxy}, timeout=5, headers=headers)
+        response.raise_for_status()
+        test_url = "https://report.az/en"
+        response = requests.get(test_url, proxies={"https": proxy}, timeout=5, headers=headers)
         response.raise_for_status()
         print(f"Working proxy: {proxy}, Response: {response.json()}")
         return True
@@ -239,7 +248,7 @@ def get_user_headline():
     headline = input("Type in headline: ")
     return headline
 
-def get_article_photo(random_file_name, headline):
+def get_article_photo(random_file_name):
     gis = GoogleImagesSearch(GCS_DEVELOPER_KEY, GCS_CX)
     search_query = input("Search query for article image: ")
     params = {
@@ -314,7 +323,7 @@ def create_post(ai_response, headline, tag, random_file_name):
 
     with open(HTML_TEMPLATE, 'r') as file:
         html_template = file.read()
-        filled_template = html_template.replace('{{date}}', todays_date_formatted).replace('{{tag}}', tag). replace('{{headline}}', headline).replace('{{body}}', ai_response).replace('{{image}}', random_file_name)
+        filled_template = html_template.replace('{{date}}', todays_date_formatted).replace('{{tag}}', tag).replace('{{headline}}', headline).replace('{{body}}', ai_response).replace('{{image}}', random_file_name)
 
     finished_post = open('tmp/' + random_file_name + '.html', "x")
     finished_post.write(filled_template)
